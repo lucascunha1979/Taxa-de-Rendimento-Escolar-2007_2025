@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Painel das Taxas de Rendimento Escolar do INEP, 2007 a 2025"
+    >
+
+    <title>
+        Taxas de Rendimento Escolar | RS | 2007–2025
+    </title>
+
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <link
+        rel="stylesheet"
+        href="styles.css?v=3"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- ==================================================================================== -->
+<!-- CABEÇALHO -->
+<!-- ==================================================================================== -->
+
+<header class="hero">
+
+    <div class="hero-inner">
+
+        <div>
+
+            <span class="hero-tag">
+                INEP · Censo Escolar · 2007–2025
+            </span>
+
+            <h1>
+                Taxas de Rendimento Escolar
+            </h1>
+
+            <p>
+                Rio Grande do Sul em perspectiva nacional,
+                municipal e escolar.
+            </p>
+
+        </div>
+
+
+        <div class="hero-direita">
+
+            <a
+                href="https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/indicadores-educacionais/taxas-de-rendimento-escolar"
+                target="_blank"
+                rel="noopener"
+            >
+                Fonte oficial · INEP ↗
+            </a>
+
+            <span id="statusTexto">
+                Carregando dados...
+            </span>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- ==================================================================================== -->
+<!-- FILTROS GLOBAIS -->
+<!-- ==================================================================================== -->
+
+<section class="barra-filtros">
+
+    <div class="filtros-inner">
+
+
+        <div class="campo">
+
+            <label for="filtroResultado">
+                Indicador
+            </label>
+
+            <select id="filtroResultado">
+
+                <option value="Aprovação">
+                    Aprovação
+                </option>
+
+                <option value="Reprovação">
+                    Reprovação
+                </option>
+
+                <option value="Abandono">
+                    Abandono
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="campo campo-etapa">
+
+            <label for="filtroEtapa">
+                Etapa de ensino
+            </label>
+
+            <select id="filtroEtapa">
+
+                <option value="Ensino Fundamental - Total">
+                    Ensino Fundamental — Total
+                </option>
+
+                <option value="Ensino Fundamental - Anos Iniciais">
+                    Ensino Fundamental — Anos Iniciais
+                </option>
+
+                <option value="Ensino Fundamental - Anos Finais">
+                    Ensino Fundamental — Anos Finais
+                </option>
+
+                <option value="Ensino Médio - Total">
+                    Ensino Médio — Total
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="campo">
+
+            <label for="filtroLocalizacao">
+                Localização
+            </label>
+
+            <select id="filtroLocalizacao">
+
+                <option value="Total">
+                    Total
+                </option>
+
+                <option value="Urbana">
+                    Urbana
+                </option>
+
+                <option value="Rural">
+                    Rural
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="campo">
+
+            <label for="filtroDependencia">
+                Rede
+            </label>
+
+            <select id="filtroDependencia">
+
+                <option value="Total">
+                    Total
+                </option>
+
+                <option value="Pública">
+                    Pública
+                </option>
+
+                <option value="Federal">
+                    Federal
+                </option>
+
+                <option value="Estadual">
+                    Estadual
+                </option>
+
+                <option value="Municipal">
+                    Municipal
+                </option>
+
+                <option value="Privada">
+                    Privada
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="controle-tempo">
+
+            <div class="controle-tempo-topo">
+
+                <label>
+                    Ano
+                </label>
+
+                <strong id="anoAtual">
+                    2025
+                </strong>
+
+            </div>
+
+
+            <div class="controle-tempo-linha">
+
+                <button
+                    id="btnPlay"
+                    class="btn-play"
+                    type="button"
+                >
+                    ▶ Reproduzir
+                </button>
+
+
+                <input
+                    id="sliderAno"
+                    type="range"
+                    min="2007"
+                    max="2025"
+                    step="1"
+                    value="2025"
+                >
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================================================== -->
+<!-- ABAS -->
+<!-- ==================================================================================== -->
+
+<nav class="abas">
+
+    <div class="abas-inner">
+
+        <button
+            class="aba-btn ativa"
+            data-tab="ufs"
+            type="button"
+        >
+            Brasil e UFs
+        </button>
+
+
+        <button
+            class="aba-btn"
+            data-tab="municipios"
+            type="button"
+        >
+            Municípios RS
+        </button>
+
+
+        <button
+            class="aba-btn"
+            data-tab="escolas"
+            type="button"
+        >
+            Escolas RS
+        </button>
+
+
+        <button
+            class="aba-btn"
+            data-tab="metodologia"
+            type="button"
+        >
+            Metodologia
+        </button>
+
+    </div>
+
+</nav>
+
+
+<main class="container">
+
+
+<!-- ==================================================================================== -->
+<!-- ABA 1 - BRASIL / UFs -->
+<!-- ==================================================================================== -->
+
+<section
+    id="tab-ufs"
+    class="tab-content ativa"
+>
+
+
+    <div class="secao-titulo">
+
+        <div>
+
+            <span class="eyebrow">
+                Brasil e Unidades da Federação
+            </span>
+
+            <h2>
+                Rio Grande do Sul em perspectiva nacional
+            </h2>
+
+            <p id="resumoSelecaoUF">
+                —
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- KPIs -->
+
+    <div class="kpis">
+
+        <article class="kpi">
+
+            <span>
+                Brasil
+            </span>
+
+            <strong id="kpiBrasil">
+                —
+            </strong>
+
+            <small>
+                resultado oficial
+            </small>
+
+        </article>
+
+
+        <article class="kpi kpi-rs">
+
+            <span>
+                Rio Grande do Sul
+            </span>
+
+            <strong id="kpiRS">
+                —
+            </strong>
+
+            <small>
+                resultado estadual
+            </small>
+
+        </article>
+
+
+        <article class="kpi">
+
+            <span>
+                Média simples das 27 UFs
+            </span>
+
+            <strong id="kpiMediaUF">
+                —
+            </strong>
+
+            <small>
+                média não ponderada
+            </small>
+
+        </article>
+
+
+        <article class="kpi">
+
+            <span>
+                Posição do RS
+            </span>
+
+            <strong id="kpiPosicaoRS">
+                —
+            </strong>
+
+            <small id="kpiPosicaoNota">
+                entre 27 UFs
+            </small>
+
+        </article>
+
+    </div>
+
+
+    <!-- Ranking + comparação -->
+
+    <div class="grid-uf-principal">
+
+        <article class="card">
+
+            <div class="card-head">
+
+                <div>
+
+                    <h3>
+                        Ranking das 27 UFs
+                    </h3>
+
+                    <p>
+                        O botão Reproduzir acompanha a mudança do ranking entre 2007 e 2025.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="graficoRankingUF"
+                class="grafico ranking-uf"
+            ></div>
+
+        </article>
+
+
+        <article class="card">
+
+            <div class="card-head">
+
+                <div>
+
+                    <h3>
+                        Evolução histórica
+                    </h3>
+
+                    <p>
+                        Compare o RS com até três UFs.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="comparadores">
+
+                <div class="campo">
+
+                    <label>
+                        Comparar 1
+                    </label>
+
+                    <select id="compararUF1"></select>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Comparar 2
+                    </label>
+
+                    <select id="compararUF2"></select>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Comparar 3
+                    </label>
+
+                    <select id="compararUF3"></select>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="graficoComparacaoUF"
+                class="grafico comparacao-uf"
+            ></div>
+
+        </article>
+
+    </div>
+
+
+    <!-- Donut RS compacto -->
+
+    <article class="card card-donut-compacto">
+
+        <div class="card-head">
+
+            <div>
+
+                <span class="eyebrow">
+                    Composição do rendimento
+                </span>
+
+                <h3>
+                    Rio Grande do Sul
+                </h3>
+
+                <p>
+                    Aprovação + reprovação + abandono = 100%.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="donut-compacto">
+
+            <div
+                id="graficoDonutRS"
+                class="donut-grafico"
+            ></div>
+
+
+            <div
+                id="donutRSTexto"
+                class="donut-resumo"
+            ></div>
+
+        </div>
+
+    </article>
+
+
+</section>
+
+
+<!-- ==================================================================================== -->
+<!-- ABA 2 - MUNICÍPIOS -->
+<!-- ==================================================================================== -->
+
+<section
+    id="tab-municipios"
+    class="tab-content"
+>
+
+
+    <div class="secao-titulo">
+
+        <div>
+
+            <span class="eyebrow">
+                Rio Grande do Sul
+            </span>
+
+            <h2>
+                Municípios
+            </h2>
+
+            <p>
+                Mapa, ranking e série histórica dos 497 municípios gaúchos.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- SELETOR MUNICÍPIO EM DESTAQUE -->
+
+    <div class="seletor-territorio">
+
+        <div>
+
+            <span class="seletor-label">
+                Município em análise
+            </span>
+
+            <strong>
+                Selecione um município para acompanhar sua série e composição
+            </strong>
+
+        </div>
+
+
+        <select id="filtroMunicipio">
+
+            <option value="">
+                Selecione um município
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- MAPA + RANKING -->
+
+    <div class="grid-municipios">
+
+        <article class="card card-mapa">
+
+            <div class="card-head">
+
+                <div>
+
+                    <h3>
+                        Mapa municipal
+                    </h3>
+
+                    <p id="mapaSubtitulo">
+                        —
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div id="mapa"></div>
+
+        </article>
+
+
+        <article class="card ranking-card">
+
+            <div class="card-head">
+
+                <div>
+
+                    <h3>
+                        Ranking municipal
+                    </h3>
+
+                    <p id="rankingMunicipalResumo">
+                        —
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="rankingMunicipios"
+                class="ranking-scroll"
+            ></div>
+
+        </article>
+
+    </div>
+
+
+    <!-- DETALHE MUNICIPAL -->
+
+    <div class="grid-detalhe-municipio">
+
+        <article class="card">
+
+            <div class="card-head">
+
+                <div>
+
+                    <span class="eyebrow">
+                        Série histórica
+                    </span>
+
+                    <h3 id="tituloMunicipioSelecionado">
+                        Selecione um município
+                    </h3>
+
+                    <p>
+                        A série responde à etapa, localização e rede selecionadas.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="graficoMunicipio"
+                class="grafico serie-municipal"
+            ></div>
+
+        </article>
+
+
+        <article class="card">
+
+            <div class="card-head">
+
+                <div>
+
+                    <span class="eyebrow">
+                        Composição no ano selecionado
+                    </span>
+
+                    <h3 id="tituloDonutMunicipio">
+                        Selecione um município
+                    </h3>
+
+                    <p id="subtituloDonutMunicipio">
+                        —
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="donut-compacto donut-municipio">
+
+                <div
+                    id="graficoDonutMunicipio"
+                    class="donut-grafico"
+                ></div>
+
+
+                <div
+                    id="donutMunicipioTexto"
+                    class="donut-resumo"
+                ></div>
+
+            </div>
+
+        </article>
+
+    </div>
+
+
+</section>
+
+
+<!-- ==================================================================================== -->
+<!-- ABA 3 - ESCOLAS -->
+<!-- ==================================================================================== -->
+
+<section
+    id="tab-escolas"
+    class="tab-content"
+>
+
+
+    <div class="secao-titulo">
+
+        <div>
+
+            <span class="eyebrow">
+                Rio Grande do Sul
+            </span>
+
+            <h2>
+                Escolas
+            </h2>
+
+            <p>
+                Lista das escolas com taxa disponível para o recorte selecionado.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- MUNICÍPIO EM DESTAQUE -->
+
+    <div class="seletor-territorio">
+
+        <div>
+
+            <span class="seletor-label">
+                Município
+            </span>
+
+            <strong>
+                Filtre a lista de escolas por município
+            </strong>
+
+        </div>
+
+
+        <select id="filtroMunicipioEscola">
+
+            <option value="">
+                Todos os municípios do RS
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="grid-escolas">
+
+        <!-- LISTA -->
+
+        <article class="card">
+
+            <div class="card-head">
+
+                <div>
+
+                    <h3>
+                        Lista de escolas
+                    </h3>
+
+                    <p>
+                        Clique em uma escola para visualizar sua composição.
+                    </p>
+
+                </div>
+
+
+                <div class="contador-escolas">
+
+                    <strong id="escolasEncontradas">
+                        —
+                    </strong>
+
+                    <span>
+                        escolas
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="listaEscolas"
+                class="tabela-escolas-wrapper"
+            ></div>
+
+        </article>
+
+
+        <!-- ESCOLA SELECIONADA -->
+
+        <article class="card escola-detalhe-card">
+
+            <div class="card-head">
+
+                <div>
+
+                    <span class="eyebrow">
+                        Escola selecionada
+                    </span>
+
+                    <h3 id="tituloDonutEscola">
+                        Selecione uma escola
+                    </h3>
+
+                    <p id="subtituloDonutEscola">
+                        —
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="donut-escola">
+
+                <div
+                    id="graficoDonutEscola"
+                    class="donut-grafico"
+                ></div>
+
+
+                <div
+                    id="donutEscolaTexto"
+                    class="donut-resumo"
+                ></div>
+
+            </div>
+
+        </article>
+
+    </div>
+
+
+</section>
+
+
+<!-- ==================================================================================== -->
+<!-- ABA 4 - METODOLOGIA -->
+<!-- ==================================================================================== -->
+
+<section
+    id="tab-metodologia"
+    class="tab-content"
+>
+
+
+    <div class="secao-titulo">
+
+        <div>
+
+            <span class="eyebrow">
+                Metodologia e fontes
+            </span>
+
+            <h2>
+                Taxas de Rendimento Escolar
+            </h2>
+
+            <p>
+                Conceitos utilizados na interpretação dos indicadores.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- DEFINIÇÕES -->
+
+    <div class="metodo-grid">
+
+        <article class="metodo-card aprovacao">
+
+            <strong>
+                Aprovação
+            </strong>
+
+            <p>
+                Percentual de matrículas aprovadas entre as matrículas
+                consideradas no cálculo do rendimento.
+            </p>
+
+            <code>
+                APR / (APR + REP + ABA) × 100
+            </code>
+
+        </article>
+
+
+        <article class="metodo-card reprovacao">
+
+            <strong>
+                Reprovação
+            </strong>
+
+            <p>
+                Percentual de matrículas reprovadas entre as matrículas
+                consideradas no cálculo do rendimento.
+            </p>
+
+            <code>
+                REP / (APR + REP + ABA) × 100
+            </code>
+
+        </article>
+
+
+        <article class="metodo-card abandono">
+
+            <strong>
+                Abandono
+            </strong>
+
+            <p>
+                Percentual de matrículas que deixaram de frequentar
+                a escola após a data de referência.
+            </p>
+
+            <code>
+                ABA / (APR + REP + ABA) × 100
+            </code>
+
+        </article>
+
+    </div>
+
+
+    <!-- SIGLAS -->
+
+    <article class="card metodologia-card">
+
+        <h3>
+            Siglas utilizadas nas fórmulas
+        </h3>
+
+
+        <div class="siglas-grid">
+
+            <div class="sigla">
+
+                <strong>
+                    APR
+                </strong>
+
+                <span>
+                    Número de matrículas aprovadas
+                </span>
+
+            </div>
+
+
+            <div class="sigla">
+
+                <strong>
+                    REP
+                </strong>
+
+                <span>
+                    Número de matrículas reprovadas
+                </span>
+
+            </div>
+
+
+            <div class="sigla">
+
+                <strong>
+                    ABA
+                </strong>
+
+                <span>
+                    Número de matrículas que deixaram de frequentar
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="nota-metodo">
+
+            O painel apresenta as <strong>taxas</strong> de rendimento.
+            APR, REP e ABA representam as quantidades utilizadas
+            no cálculo das taxas e não são apresentadas como
+            contagens absolutas no painel.
+
+        </div>
+
+    </article>
+
+
+    <!-- NOTAS -->
+
+    <article class="card metodologia-card">
+
+        <h3>
+            Relação entre os indicadores
+        </h3>
+
+        <p>
+            Aprovação, reprovação e abandono utilizam o mesmo
+            denominador. Para as matrículas consideradas válidas
+            no cálculo:
+        </p>
+
+
+        <div class="formula-destaque">
+            Aprovação + Reprovação + Abandono = 100%
+        </div>
+
+
+        <h3>
+            Taxa de Não Resposta
+        </h3>
+
+        <p>
+            O Inep também utiliza a Taxa de Não Resposta (TNR)
+            para verificar a representatividade das informações:
+        </p>
+
+
+        <div class="formula-secundaria">
+            TNR = SIR / (APR + REP + ABA + SIR) × 100
+        </div>
+
+
+        <p>
+            <strong>SIR</strong> corresponde às matrículas sem
+            informação de rendimento, abandono ou falecido.
+            A TNR é apresentada nesta aba apenas como referência
+            metodológica e não integra os indicadores do painel.
+        </p>
+
+
+        <h3>
+            Etapas apresentadas
+        </h3>
+
+        <p>
+            O painel utiliza somente quatro agregações:
+            Ensino Fundamental Total, Ensino Fundamental — Anos Iniciais,
+            Ensino Fundamental — Anos Finais e Ensino Médio Total.
+            Séries/anos escolares individuais não são apresentados.
+        </p>
+
+
+        <h3>
+            Ausência de informação
+        </h3>
+
+        <p>
+            Ausência na fonte é tratada como
+            <strong>NA / Sem dado</strong>.
+            Valores ausentes nunca são convertidos em zero.
+        </p>
+
+
+        <h3>
+            Redes e localização
+        </h3>
+
+        <p>
+            Os filtros preservam as categorias oficiais disponíveis
+            na série histórica. Nas escolas, “Total” significa
+            ausência de restrição do filtro, e não uma média artificial
+            das unidades escolares.
+        </p>
+
+    </article>
+
+
+    <!-- FONTES -->
+
+    <article class="card metodologia-card fontes-card">
+
+        <h3>
+            Fontes
+        </h3>
+
+
+        <p>
+            <strong>
+                Instituto Nacional de Estudos e Pesquisas Educacionais
+                Anísio Teixeira — Inep.
+            </strong>
+        </p>
+
+
+        <a
+            href="https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/indicadores-educacionais/taxas-de-rendimento-escolar"
+            target="_blank"
+            rel="noopener"
+        >
+            Taxas de Rendimento Escolar — Dados Abertos INEP ↗
+        </a>
+
+
+        <p class="fonte-secundaria">
+            Referência metodológica: Nota Técnica nº 11/2015/DEED/Inep —
+            Indicadores Educacionais produzidos a partir dos dados do
+            Censo Escolar da Educação Básica.
+        </p>
+
+    </article>
+
+
+</section>
+
+
+</main>
+
+
+<footer>
+
+    <div class="footer-inner">
+
+        <span>
+            Taxas de Rendimento Escolar · 2007–2025
+        </span>
+
+        <a
+            href="https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/indicadores-educacionais/taxas-de-rendimento-escolar"
+            target="_blank"
+            rel="noopener"
+        >
+            Fonte: INEP/MEC ↗
+        </a>
+
+    </div>
+
+</footer>
+
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+></script>
+
+<script
+    src="https://cdn.plot.ly/plotly-2.35.2.min.js"
+></script>
+
+<script
+    src="app.js?v=3"
+></script>
+
+
+</body>
+</html>
